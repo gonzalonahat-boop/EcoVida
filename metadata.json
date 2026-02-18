@@ -1,0 +1,7 @@
+{
+  "name": "Copy of EcoVida - Green Living Companion",
+  "description": "A comprehensive sustainability app featuring a carbon footprint tracker, smart recycle scanner, eco-challenges, and educational resources.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
