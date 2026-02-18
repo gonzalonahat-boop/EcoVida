@@ -1,5 +1,5 @@
 
-import { EcoChallenge, EcoArticle, EcoVideo, UserProfile } from './types';
+import { EcoChallenge, EcoArticle, UserProfile, QuizQuestion } from './types';
 
 export const MOCK_USER: UserProfile = {
   name: "Sarah Green",
@@ -30,7 +30,7 @@ export const DAILY_QUESTS: EcoChallenge[] = [
     total: 1,
     unit: "Ride",
     icon: "pedal_bike",
-    completed: true
+    completed: false
   }
 ];
 
@@ -66,17 +66,30 @@ export const ARTICLES: EcoArticle[] = [
   }
 ];
 
-export const VIDEOS: EcoVideo[] = [
+export const MICROPLASTICS_QUIZ: QuizQuestion[] = [
   {
-    id: "v1",
-    title: "Quick Guide to Home Composting",
-    duration: "0:45",
-    thumbnail: "https://picsum.photos/seed/compost/400/600"
+    id: 1,
+    question: "What is the primary source of primary microplastics in the ocean?",
+    options: ["Degraded plastic bags", "Cosmetic microbeads & fibers", "Shipwrecks", "Fish waste"],
+    correctAnswer: 1
   },
   {
-    id: "v2",
-    title: "Recycling: Common Myths Busted",
-    duration: "1:12",
-    thumbnail: "https://picsum.photos/seed/recycle/400/600"
+    id: 2,
+    question: "Roughly how many tons of plastic enter our oceans every year?",
+    options: ["1 million", "4 million", "8-12 million", "50 million"],
+    correctAnswer: 2
+  },
+  {
+    id: 3,
+    question: "Microplastics are defined as plastic particles smaller than...",
+    options: ["5 millimeters", "1 centimeter", "1 micrometer", "50 millimeters"],
+    correctAnswer: 0
   }
+];
+
+export const HALL_OF_FAME = [
+  { name: "EcoTom", points: 4520, level: 45, avatar: "https://i.pravatar.cc/150?u=tom" },
+  { name: "GreenQueen", points: 3890, level: 39, avatar: "https://i.pravatar.cc/150?u=queen" },
+  { name: "SolarSam", points: 3120, level: 31, avatar: "https://i.pravatar.cc/150?u=sam" },
+  { name: " Sarah Green (You)", points: 1250, level: 12, avatar: "https://picsum.photos/seed/sarah/200/200", current: true }
 ];

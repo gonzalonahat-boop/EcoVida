@@ -37,9 +37,9 @@ export interface EcoArticle {
   image: string;
 }
 
-export interface EcoVideo {
-  id: string;
-  title: string;
-  duration: string;
-  thumbnail: string;
+export interface QuizQuestion {
+  id: number;
+  question: string;
+  options: string[];
+  correctAnswer: number;
 }

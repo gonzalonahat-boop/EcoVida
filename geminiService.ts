@@ -11,7 +11,7 @@ export const analyzeWasteImage = async (base64Image: string) => {
       contents: {
         parts: [
           { inlineData: { data: base64Image.split(',')[1], mimeType: 'image/jpeg' } },
-          { text: "Analyze this object. Tell me exactly what material it is and if it's recyclable. Return as JSON with keys: material, isRecyclable (boolean), instructions (short), and pointsReward (integer)." }
+          { text: "Identify the main object in this photo for recycling purposes. Be extremely specific about the primary material (Plastic, Glass, Metal, Paper, or Organic). Determine if it is recyclable in standard urban systems. Provide 2 very short, clear steps for proper disposal. Assign a difficulty-based reward from 5 to 50 points. Return strictly JSON." }
         ]
       },
       config: {
@@ -21,7 +21,7 @@ export const analyzeWasteImage = async (base64Image: string) => {
           properties: {
             material: { type: Type.STRING },
             isRecyclable: { type: Type.BOOLEAN },
-            instructions: { type: Type.STRING },
+            instructions: { type: Type.STRING, description: "Max 100 characters instructions" },
             pointsReward: { type: Type.INTEGER }
           },
           required: ['material', 'isRecyclable', 'instructions', 'pointsReward']
@@ -31,20 +31,12 @@ export const analyzeWasteImage = async (base64Image: string) => {
 
     return JSON.parse(response.text);
   } catch (error) {
-    console.error("AI Analysis failed:", error);
-    return null;
+    console.error("AI Vision analysis error:", error);
+    return {
+      material: "Unknown Object",
+      isRecyclable: false,
+      instructions: "We couldn't identify the item. Please try again with better lighting.",
+      pointsReward: 0
+    };
   }
 };
-
-export const getEcoTips = async (topic: string) => {
-    const ai = getAI();
-    try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-3-flash-preview',
-            contents: `Give me 3 short, actionable eco-tips for: ${topic}. Format as a simple list.`,
-        });
-        return response.text;
-    } catch (e) {
-        return "Always remember to reduce, reuse, and recycle!";
-    }
-}

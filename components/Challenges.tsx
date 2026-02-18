@@ -1,121 +1,156 @@
 
-import React from 'react';
-import { MOCK_USER, DAILY_QUESTS, WEEKLY_GOALS } from '../constants';
+import React, { useState } from 'react';
+import { MOCK_USER, DAILY_QUESTS, WEEKLY_GOALS, HALL_OF_FAME } from '../constants';
 
-const Challenges: React.FC = () => {
+interface ChallengesProps {
+  totalPoints: number;
+}
+
+const Challenges: React.FC<ChallengesProps> = ({ totalPoints }) => {
+  const [activeSubTab, setActiveSubTab] = useState<'goals' | 'fame'>('goals');
+  const [completedQuests, setCompletedQuests] = useState<string[]>([]);
+  const [loadingQuest, setLoadingQuest] = useState<string | null>(null);
+
+  const handleVerify = (id: string) => {
+    setLoadingQuest(id);
+    setTimeout(() => {
+      setCompletedQuests(prev => [...prev, id]);
+      setLoadingQuest(null);
+    }, 1500);
+  };
+
   return (
-    <div className="animate-in slide-in-from-right duration-500">
+    <div className="animate-in slide-in-from-right duration-700">
       {/* Profile Header */}
-      <div className="flex p-6 items-center gap-4 bg-white dark:bg-zinc-900 border-b border-zinc-100 dark:border-zinc-800">
+      <div className="flex p-8 items-center gap-6 bg-white dark:bg-zinc-900 border-b border-zinc-100 dark:border-zinc-800">
         <div className="relative">
-            <img src={MOCK_USER.avatar} className="size-20 rounded-full border-4 border-primary/20 object-cover" alt="Profile" />
-            <div className="absolute -bottom-1 -right-1 size-7 bg-primary rounded-full border-2 border-white dark:border-zinc-900 flex items-center justify-center text-white">
+            <img src={MOCK_USER.avatar} className="size-20 rounded-full border-[6px] border-primary/10 object-cover shadow-xl" alt="Profile" />
+            <div className="absolute -bottom-1 -right-1 size-8 bg-primary rounded-full border-4 border-white dark:border-zinc-900 flex items-center justify-center text-white shadow-lg">
                 <span className="material-symbols-outlined text-sm filled-icon">military_tech</span>
             </div>
         </div>
         <div className="flex-1">
-          <h2 className="text-xl font-black">{MOCK_USER.name}</h2>
-          <div className="flex items-center gap-1 text-primary">
-            <p className="text-sm font-bold">Level {MOCK_USER.level} {MOCK_USER.title}</p>
-          </div>
+          <h2 className="text-xl font-black text-zinc-900 dark:text-white leading-tight">{MOCK_USER.name}</h2>
+          <p className="text-[10px] font-black text-primary uppercase tracking-widest mt-1">Lvl {Math.floor(totalPoints/100)} Eco-Master</p>
         </div>
-        <div className="bg-primary/10 dark:bg-primary/20 px-4 py-2 rounded-2xl text-center border border-primary/20">
-          <p className="text-[10px] font-bold text-primary uppercase tracking-wider">Total Points</p>
-          <p className="text-xl font-black text-primary">{MOCK_USER.points.toLocaleString()}</p>
+        <div className="bg-zinc-900 dark:bg-primary text-white px-4 py-3 rounded-2xl text-center">
+          <p className="text-[7px] font-black uppercase tracking-widest mb-1 opacity-70">Points</p>
+          <p className="text-xl font-black leading-none">{totalPoints + (completedQuests.length * 50)}</p>
         </div>
       </div>
 
       {/* Tab Selector */}
-      <div className="px-6 py-4">
-        <div className="flex h-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 p-1">
-          <button className="flex-1 h-full bg-primary text-white rounded-full text-sm font-bold">Challenges</button>
-          <button className="flex-1 h-full text-zinc-500 dark:text-zinc-400 text-sm font-bold">Leaderboard</button>
+      <div className="px-8 py-6">
+        <div className="flex h-12 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800 p-1">
+          <button 
+            onClick={() => setActiveSubTab('goals')}
+            className={`flex-1 h-full rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeSubTab === 'goals' ? 'bg-white dark:bg-zinc-900 shadow-sm text-zinc-900 dark:text-white' : 'text-zinc-400'}`}
+          >
+            My Goals
+          </button>
+          <button 
+            onClick={() => setActiveSubTab('fame')}
+            className={`flex-1 h-full rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeSubTab === 'fame' ? 'bg-white dark:bg-zinc-900 shadow-sm text-zinc-900 dark:text-white' : 'text-zinc-400'}`}
+          >
+            Hall of Fame
+          </button>
         </div>
       </div>
 
-      {/* Daily Quests */}
-      <section className="px-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-black">Daily Quests</h3>
-          <span className="text-primary text-xs font-bold bg-primary/10 px-3 py-1 rounded-full">2 Remaining</span>
-        </div>
-        
-        <div className="space-y-4">
-          {DAILY_QUESTS.map((quest) => (
-            <div key={quest.id} className={`flex flex-col rounded-3xl overflow-hidden shadow-sm border ${quest.completed ? 'bg-zinc-50 dark:bg-zinc-800/50 opacity-70 grayscale' : 'bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800'}`}>
-              {quest.image && (
-                <div className="relative h-32 w-full overflow-hidden">
-                    <img src={quest.image} className="w-full h-full object-cover" alt={quest.title} />
-                    <div className="absolute top-3 right-3 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full">
-                        +{quest.points} pts
-                    </div>
-                </div>
-              )}
-              <div className="p-5">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <h4 className={`font-black ${quest.completed ? 'line-through' : ''}`}>{quest.title}</h4>
-                        <p className="text-xs text-zinc-400 font-medium">{quest.description}</p>
-                    </div>
-                    {quest.completed && (
-                        <span className="material-symbols-outlined text-primary text-3xl filled-icon">verified</span>
+      {activeSubTab === 'goals' ? (
+        <div className="px-8 space-y-8 animate-in fade-in duration-300">
+          <section className="space-y-6">
+            <h3 className="text-xl font-black">Daily Quests</h3>
+            <div className="space-y-5">
+              {DAILY_QUESTS.map((quest) => {
+                const isDone = completedQuests.includes(quest.id) || quest.completed;
+                return (
+                  <div key={quest.id} className={`flex flex-col rounded-[2.5rem] overflow-hidden shadow-sm border ${isDone ? 'bg-zinc-50 dark:bg-zinc-800/50 opacity-80' : 'bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800'}`}>
+                    {quest.image && (
+                      <div className="h-32 relative overflow-hidden">
+                          <img src={quest.image} className="w-full h-full object-cover" alt={quest.title} />
+                      </div>
                     )}
-                </div>
-                
-                {!quest.completed && (
-                    <div className="mt-4">
-                        <div className="flex justify-between items-center mb-2">
-                            <div className="flex-1 h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full mr-4">
-                                <div 
-                                    className="h-full bg-primary rounded-full transition-all duration-1000" 
-                                    style={{ width: `${(quest.progress / quest.total) * 100}%` }}
-                                ></div>
-                            </div>
-                            <span className="text-[10px] font-bold text-primary">{quest.progress}/{quest.total} {quest.unit}</span>
-                        </div>
-                        <button className="w-full bg-primary text-white py-3 rounded-full font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform">
-                            <span className="material-symbols-outlined text-lg">{quest.icon}</span>
-                            Log Action
-                        </button>
+                    <div className="p-6">
+                      <div className="flex justify-between items-start mb-4">
+                          <div>
+                              <h4 className="font-black text-lg leading-tight">{quest.title}</h4>
+                              <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-tighter mt-1">{quest.description}</p>
+                          </div>
+                          {isDone ? (
+                            <span className="material-symbols-outlined text-primary text-3xl filled-icon">verified</span>
+                          ) : (
+                            <div className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black">+{quest.points} pts</div>
+                          )}
+                      </div>
+                      {!isDone && (
+                          <button 
+                            disabled={loadingQuest === quest.id}
+                            onClick={() => handleVerify(quest.id)}
+                            className="w-full bg-primary text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center justify-center"
+                          >
+                              {loadingQuest === quest.id ? (
+                                <div className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                              ) : 'Verify Task'}
+                          </button>
+                      )}
                     </div>
-                )}
-              </div>
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
-      </section>
+          </section>
 
-      {/* Weekly Goals */}
-      <section className="px-6 py-8 pb-32">
-        <h3 className="text-lg font-black mb-4">Weekly Goals</h3>
-        {WEEKLY_GOALS.map((goal) => (
-            <div key={goal.id} className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-xl shadow-zinc-200/50 dark:shadow-none">
-                <div className="flex justify-between items-start mb-6">
-                    <div className="size-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
-                        <span className="material-symbols-outlined text-3xl">{goal.icon}</span>
+          <section className="pb-32">
+            <h3 className="text-xl font-black mb-6">Weekly Goals</h3>
+            {WEEKLY_GOALS.map((goal) => (
+                <div key={goal.id} className="p-8 rounded-[3rem] bg-zinc-900 dark:bg-zinc-800 text-white shadow-2xl">
+                    <div className="flex justify-between items-center mb-6">
+                        <div className="size-12 bg-white/10 rounded-xl flex items-center justify-center text-primary">
+                            <span className="material-symbols-outlined text-2xl">{goal.icon}</span>
+                        </div>
+                        <p className="text-primary text-xl font-black">+{goal.points} XP</p>
                     </div>
-                    <div className="text-right">
-                        <p className="text-primary font-black">+{goal.points} pts</p>
-                        <p className="text-zinc-400 text-[10px] font-bold">3 days left</p>
-                    </div>
-                </div>
-                <h4 className="font-black text-lg">{goal.title}</h4>
-                <p className="text-xs text-zinc-400 font-medium mb-6">{goal.description}</p>
-                <div className="space-y-2">
-                    <div className="flex justify-between text-[10px] font-bold text-zinc-500">
-                        <span>Progress</span>
-                        <span>{goal.progress}/{goal.total} {goal.unit}</span>
-                    </div>
-                    <div className="h-3 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                    <h4 className="font-black text-xl mb-4">{goal.title}</h4>
+                    <div className="h-3 bg-white/10 rounded-full overflow-hidden mb-3">
                         <div 
-                            className="h-full bg-primary rounded-full shadow-[0_0_10px_rgba(46,204,112,0.4)] transition-all duration-1000" 
+                            className="h-full bg-primary rounded-full shadow-[0_0_15px_#2ecc70] transition-all duration-1000" 
                             style={{ width: `${(goal.progress / goal.total) * 100}%` }}
                         ></div>
                     </div>
+                    <div className="flex justify-between text-[8px] font-black text-white/40 uppercase tracking-widest">
+                        <span>Progress</span>
+                        <span>{goal.progress} / {goal.total} Days</span>
+                    </div>
                 </div>
-            </div>
-        ))}
-      </section>
+            ))}
+          </section>
+        </div>
+      ) : (
+        <div className="px-8 space-y-6 animate-in slide-in-from-right duration-300 pb-32">
+          <h3 className="text-xl font-black">Global Ranking</h3>
+          <div className="space-y-4">
+            {HALL_OF_FAME.map((entry, i) => (
+              <div key={i} className={`flex items-center gap-4 p-5 rounded-[2rem] border ${entry.current ? 'bg-primary/5 border-primary ring-2 ring-primary/20' : 'bg-white dark:bg-zinc-900 border-zinc-50 dark:border-zinc-800'}`}>
+                <div className="size-8 font-black text-xs text-zinc-400 flex items-center justify-center">#{i+1}</div>
+                <img src={entry.avatar} className="size-12 rounded-full border-2 border-zinc-100" alt={entry.name} />
+                <div className="flex-1">
+                  <h4 className="font-black text-sm">{entry.name}</h4>
+                  <p className="text-[10px] font-bold text-zinc-400 uppercase">Lvl {entry.level} Hunter</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-black text-zinc-900 dark:text-white">{entry.points.toLocaleString()}</p>
+                  <p className="text-[8px] font-black text-primary uppercase tracking-widest">Points</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="bg-zinc-100 dark:bg-zinc-800 p-8 rounded-[2.5rem] text-center">
+            <span className="material-symbols-outlined text-4xl text-zinc-400 mb-2">emoji_events</span>
+            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Keep saving carbon to reach the Top 3!</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
